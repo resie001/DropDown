@@ -187,7 +187,7 @@ public final class DropDown: UIView {
 		didSet { reloadAllComponents() }
 	}
     
-    @objc public dynamic var height = DPDConstant.UI.Height {
+    @objc public dynamic var dropdownHeight = DPDConstant.UI.Height {
         willSet { height = newValue }
         didSet { updateConstraints() }
     }
