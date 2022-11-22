@@ -153,6 +153,10 @@ public final class DropDown: UIView {
 	public var width: CGFloat? {
 		didSet { setNeedsUpdateConstraints() }
 	}
+    
+    public var height: CGFloat? {
+           didSet { setNeedsUpdateConstraints() }
+     }
 
 	/**
 	arrowIndication.x
@@ -182,6 +186,11 @@ public final class DropDown: UIView {
 		willSet { tableView.rowHeight = newValue }
 		didSet { reloadAllComponents() }
 	}
+    
+    @objc public dynamic var height = DPDConstant.UI.Height {
+        willSet { height = newValue }
+        didSet { updateConstraints() }
+    }
 
 	@objc fileprivate dynamic var tableViewBackgroundColor = DPDConstant.UI.BackgroundColor {
 		willSet {
@@ -578,7 +587,15 @@ extension DropDown {
 		xConstraint.constant = layout.x
 		yConstraint.constant = layout.y
 		widthConstraint.constant = layout.width
-		heightConstraint.constant = layout.visibleHeight
+        if let height = self.height {
+            if layout.visibleHeight >= height {
+                 heightConstraint.constant = self.height ?? layout.visibleHeight
+             } else {
+                 heightConstraint.constant = layout.visibleHeight
+             }
+        } else {
+             heightConstraint.constant = layout.visibleHeight
+        }
 
 		tableView.isScrollEnabled = layout.offscreenHeight > 0
 
@@ -751,10 +768,14 @@ extension DropDown {
 
 		let windowY = window.bounds.minY + DPDConstant.UI.HeightPadding
 
-		if y < windowY {
-			offscreenHeight = abs(y - windowY)
-			y = windowY
-		}
+        if y < windowY {
+            offscreenHeight = abs(y - windowY)
+            if let height = self.height {
+                y = anchorViewMaxY + topOffset.y - height
+            } else {
+                y = windowY
+            }
+        }
 		
 		let width = self.width ?? (anchorView?.plainView.bounds.width ?? fittingWidth()) - topOffset.x
 		
